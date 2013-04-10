@@ -71,9 +71,9 @@ extern "C"
   char* dll_getenv(const char* szKey);
 }
 
-XBPyThread::XBPyThread(XBPython *pExecuter, int id) : CThread("XBPyThread")
+XBPyThread::XBPyThread(XBPython *pExecuter, int id) : CThread("XBPython %d", id)
 {
-  CLog::Log(LOGDEBUG,"new python thread created. id=%d", id);
+  CLog::Log(LOGDEBUG,"New python thread created: id=%d", id);
   m_pExecuter   = pExecuter;
   m_threadState = NULL;
   m_id          = id;
@@ -88,9 +88,9 @@ XBPyThread::~XBPyThread()
 {
   stop();
   g_pythonParser.PulseGlobalEvent();
-  CLog::Log(LOGDEBUG,"waiting for python thread %d (%s) to stop", m_id, (m_source ? m_source : "unknown script"));
+  CLog::Log(LOGDEBUG,"Waiting for python thread %d (%s) to stop", m_id, (m_source ? m_source : "unknown script"));
   StopThread();
-  CLog::Log(LOGDEBUG,"python thread %d (%s) destructed", m_id, (m_source ? m_source : "unknown script"));
+  CLog::Log(LOGDEBUG,"Python thread %d (%s) destructed", m_id, (m_source ? m_source : "unknown script"));
   delete [] m_source;
   if (m_argv)
   {
@@ -191,6 +191,9 @@ void XBPyThread::Process()
   languageHook->RegisterMe();
 
   m_pExecuter->InitializeInterpreter(addon);
+
+  m_ThreadName = m_source;
+  SetThreadInfo()
 
   CLog::Log(LOGDEBUG, "%s - The source file to load is %s", __FUNCTION__, m_source);
 

@@ -18,6 +18,8 @@
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdarg.h>
+#include "utils/StdString.h"
 #include "threads/SystemClock.h"
 #include "Thread.h"
 #include "threads/ThreadLocal.h"
@@ -39,7 +41,7 @@ XbmcCommons::ILogger* CThread::logger = NULL;
 
 #define LOG if(logger) logger->Log
 
-CThread::CThread(const char* ThreadName)
+CThread::CThread(const char *ThreadFormat, ... )
 : m_StopEvent(true,true), m_TermEvent(true), m_StartEvent(true)
 {
   m_bStop = false;
@@ -52,11 +54,20 @@ CThread::CThread(const char* ThreadName)
 
   m_pRunnable=NULL;
 
-  if (ThreadName)
+  if (ThreadName) {
+    CStdString ThreadName;
+    ThreadName.reserve(64);
+    va_list va;
+    va_start(va, ThreadFormat);
+    ThreadName.FormatV(ThreadFormat, va);
+    va_end(va);
     m_ThreadName = ThreadName;
+  } else {
+    m_ThreadName = "Unnamed";
+  }
 }
 
-CThread::CThread(IRunnable* pRunnable, const char* ThreadName)
+CThread::CThread(IRunnable* pRunnable, const char *ThreadFormat, ... )
 : m_StopEvent(true,true), m_TermEvent(true), m_StartEvent(true)
 {
   m_bStop = false;
@@ -69,8 +80,18 @@ CThread::CThread(IRunnable* pRunnable, const char* ThreadName)
 
   m_pRunnable=pRunnable;
 
-  if (ThreadName)
+  if (ThreadFormat) {
+    CStdString ThreadName;
+    ThreadName.reserve(64);
+    va_list va;
+    va_start(va, ThreadFormat);
+    ThreadName.FormatV(ThreadFormat, va);
+    va_end(va);
+
     m_ThreadName = ThreadName;
+  } else {
+    m_ThreadName = "Unnamed";
+  }
 }
 
 CThread::~CThread()
