@@ -62,8 +62,10 @@ CVideoPlayerAudio::CVideoPlayerAudio(CDVDClock* pClock, CDVDMessageQueue& parent
   m_prevskipped = false;
   m_maxspeedadjust = 0.0;
 
-  m_messageQueue.SetMaxDataSize(6 * 1024 * 1024);
-  m_messageQueue.SetMaxTimeSize(8.0);
+  MEMORYSTATUSEX stat;
+  bool small_mem = stat.ullTotalPhys / 1024 / 1024 < 256;
+  m_messageQueue.SetMaxDataSize((small_mem ? 3:40) * 1024 * 1024);
+  m_messageQueue.SetMaxTimeSize(10.0);
 }
 
 CVideoPlayerAudio::~CVideoPlayerAudio()

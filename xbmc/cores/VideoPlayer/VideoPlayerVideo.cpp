@@ -65,8 +65,11 @@ CVideoPlayerVideo::CVideoPlayerVideo(CDVDClock* pClock
   m_iLateFrames = 0;
   m_iDroppedRequest = 0;
   m_fForcedAspectRatio = 0;
-  m_messageQueue.SetMaxDataSize(40 * 1024 * 1024);
-  m_messageQueue.SetMaxTimeSize(8.0);
+
+  MEMORYSTATUSEX stat;
+  bool small_mem = stat.ullTotalPhys / 1024 / 1024 < 256;
+  m_messageQueue.SetMaxDataSize((small_mem ? 10:40) * 1024 * 1024);
+  m_messageQueue.SetMaxTimeSize(10.0);
 
   m_iDroppedFrames = 0;
   m_fFrameRate = 25;
